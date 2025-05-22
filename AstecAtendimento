@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz RACI - Líderes Squad vs Chapter</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #475569;
+            --light: #f1f5f9;
+            --dark: #1e293b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-button {
+            padding: 0.5rem 1rem;
+            background-color: var(--light);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .filter-button:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .filter-button.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        
+        .category-header {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+        }
+        
+        .responsavel {
+            background-color: rgba(34, 197, 94, 0.2);
+            font-weight: 600;
+        }
+        
+        .corresponsavel {
+            background-color: rgba(59, 130, 246, 0.2);
+            font-weight: 600;
+        }
+        
+        .consultado {
+            background-color: rgba(245, 158, 11, 0.2);
+        }
+        
+        .informado {
+            background-color: rgba(148, 163, 184, 0.2);
+        }
+        
+        .apoia {
+            background-color: rgba(139, 92, 246, 0.2);
+        }
+        
+        .na {
+            background-color: rgba(226, 232, 240, 0.5);
+            color: #94a3b8;
+            font-style: italic;
+        }
+        
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--secondary);
+            padding: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Matriz RACI - Gestão de Assistência Técnica</h1>
+            <p>Divisão de responsabilidades entre Líder da Squad e Líder do Chapter</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="filters">
+            <button class="filter-button active" data-category="all">Todas Categorias</button>
+            <button class="filter-button" data-category="estrategia">Estratégia</button>
+            <button class="filter-button" data-category="operacoes">Operações</button>
+            <button class="filter-button" data-category="execucao">Execução</button>
+            <button class="filter-button" data-category="capacitacao">Capacitação</button>
+            <button class="filter-button" data-category="relacionamento">Relacionamento</button>
+            <button class="filter-button" data-category="inovacao">Inovação</button>
+            <button class="filter-button" data-category="crises">Gestão de Crises</button>
+            <button class="filter-button" data-category="conformidade">Conformidade</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(34, 197, 94, 0.2);"></div>
+                <span>R - Responsável</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></div>
+                <span>C - Corresponsável</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(245, 158, 11, 0.2);"></div>
+                <span>C - Consultado</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(148, 163, 184, 0.2);"></div>
+                <span>I - Informado</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(139, 92, 246, 0.2);"></div>
+                <span>A - Apoia</span>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="raciTable">
+                <thead>
+                    <tr>
+                        <th>Atividade</th>
+                        <th>Líder da Squad</th>
+                        <th>Líder do Chapter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Estratégia e Planejamento -->
+                    <tr class="category-header" data-category="estrategia">
+                        <td colspan="3">Estratégia e Planejamento</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Definição de prioridades de manutenção por empreendimento</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Planejamento do ciclo de manutenções preventivas</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Definição da estratégia de atendimento a emergências</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Análise de custos e orçamento para manutenções</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Definição de SLAs para diferentes tipos de chamados</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Alinhamento com objetivos imobiliários da empresa</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="informado">Informado</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Desenvolvimento de estratégias para redução de custos de manutenção</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="estrategia">
+                        <td>Planejamento de modernização de equipamentos e sistemas</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    
+                    <!-- Gestão de Operações -->
+                    <tr class="category-header" data-category="operacoes">
+                        <td colspan="3">Gestão de Operações</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Gestão do backlog de chamados técnicos</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="informado">Informado</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Priorização diária de atendimentos</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Alocação de técnicos por região/empreendimento</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Gestão de fornecedores e terceirizados</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Definição de rotas e logística de atendimento</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Monitoramento de tempos de resposta e resolução</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="informado">Informado</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Gestão de estoque de peças e materiais</td>
+                        <td class="na">N/A</td>
+                        <td class="na">N/A</td>
+                    </tr>
+                    <tr data-category="operacoes">
+                        <td>Autorização de compras emergenciais</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    
+                    <!-- Execução e Qualidade Técnica -->
+                    <tr class="category-header" data-category="execucao">
+                        <td colspan="3">Execução e Qualidade Técnica</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Definição de procedimentos técnicos de manutenção</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Especificação técnica para compra de equipamentos</td>
+                        <td class="informado">Informado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Desenvolvimento de checklists de manutenção</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Análise de falhas recorrentes e soluções definitivas</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Validação técnica de serviços realizados</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Elaboração de relatórios técnicos para clientes/gestores</td>
+                        <td class="informado">Informado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Desenvolvimento de soluções para problemas complexos</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="execucao">
+                        <td>Homologação de fornecedores sob aspecto técnico</td>
+                        <td class="na">N/A</td>
+                        <td class="na">N/A</td>
+                    </tr>
+                    
+                    <!-- Capacitação e Desenvolvimento -->
+                    <tr class="category-header" data-category="capacitacao">
+                        <td colspan="3">Capacitação e Desenvolvimento</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Treinamento técnico da equipe</td>
+                        <td class="apoia">Apoia</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Elaboração de manuais e documentação técnica</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Mentoria para resolução de problemas complexos</td>
+                        <td class="informado">Informado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Avaliação de competências técnicas da equipe</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Desenvolvimento de planos de carreira técnicos</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Treinamento em atendimento ao cliente</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Desenvolvimento de lideranças técnicas</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="capacitacao">
+                        <td>Identificação de necessidades de capacitação</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    
+                    <!-- Gestão de Relacionamento -->
+                    <tr class="category-header" data-category="relacionamento">
+                        <td colspan="3">Gestão de Relacionamento</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Comunicação com administração dos empreendimentos</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Gestão de expectativas dos clientes</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Condução de reuniões de alinhamento com stakeholders</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Negociação de prazos com clientes</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Tratamento de reclamações e escalações</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Participação em reuniões com síndicos/administradores</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Apresentação de relatórios gerenciais à diretoria</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="relacionamento">
+                        <td>Comunicação de impactos operacionais</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    
+                    <!-- Inovação e Melhoria Contínua -->
+                    <tr class="category-header" data-category="inovacao">
+                        <td colspan="3">Inovação e Melhoria Contínua</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Implementação de novas tecnologias para monitoramento</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Sugestão de melhorias em projetos futuros</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Compilação e apresentação dos dados de indicadores de desempenho técnico</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="informado">Informado</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Análise de indicadores de desempenho técnico</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Revisão periódica de processos de manutenção</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Benchmarking de práticas de mercado</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Implementação de automações em processos</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Desenvolvimento de soluções preventivas</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="inovacao">
+                        <td>Análise de eficiência energética e sustentabilidade</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    
+                    <!-- Gestão de Crises e Emergências -->
+                    <tr class="category-header" data-category="crises">
+                        <td colspan="3">Gestão de Crises e Emergências</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Coordenação de atendimentos emergenciais</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Definição de planos de contingência</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Comunicação com stakeholders em casos críticos</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Gestão de recursos em situações de emergência</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Análise posterior de incidentes críticos</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Definição de protocolos de segurança</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Treinamento para situações de emergência</td>
+                        <td class="apoia">Apoia</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="crises">
+                        <td>Acionamento de planos de backup</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    
+                    <!-- Conformidade e Documentação -->
+                    <tr class="category-header" data-category="conformidade">
+                        <td colspan="3">Conformidade e Documentação</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Garantia de conformidade com normas técnicas</td>
+                        <td class="informado">Informado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Gestão de certificações e laudos técnicos</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Acompanhamento de alterações regulatórias</td>
+                        <td class="informado">Informado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Documentação de procedimentos operacionais</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Manutenção de histórico de intervenções</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Organização de documentação técnica dos empreendimentos</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Gestão de garantias de equipamentos e serviços</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="conformidade">
+                        <td>Desenvolvimento de políticas de manutenção</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2025 Matriz RACI - Gestão de Assistência Técnica</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referências aos elementos
+            const filterButtons = document.querySelectorAll('.filter-button');
+            const tableRows = document.querySelectorAll('#raciTable tbody tr');
+            
+            // Variável de estado
+            let currentCategory = 'all';
+            
+            // Função para atualizar a visualização da tabela
+            function updateTableView() {
+                // Primeiro, oculta todas as linhas
+                tableRows.forEach(row => {
+                    row.style.display = 'none';
+                });
+                
+                // Exibe as linhas que correspondem à categoria atual
+                tableRows.forEach(row => {
+                    const rowCategory = row.getAttribute('data-category');
+                    
+                    if (currentCategory === 'all' || rowCategory === currentCategory) {
+                        row.style.display = '';
+                    }
+                });
+            }
+            
+            // Event listener para botões de filtro
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Atualiza a categoria selecionada
+                    currentCategory = this.getAttribute('data-category');
+                    
+                    // Atualiza classes dos botões
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Atualiza a visualização
+                    updateTableView();
+                });
+            });
+            
+            // Inicializa a visualização
+            updateTableView();
+        });
+    </script>
+</body>
+</html>
