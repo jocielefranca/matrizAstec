@@ -6,9 +6,10 @@
     <title>Matriz RACI - Líderes Squad vs Chapter</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #475569;
+            --primary: #1B5E20;        /* Verde Escuro - títulos e elementos principais */
+            --primary-dark: #0D3A10;   /* Tom mais escuro para hover/active */
+            --secondary: #26A69A;      /* Verde Médio - seções importantes e destaques */
+            --accent: #00BCD4;         /* Azul Claro - acentos e elementos secundários */
             --light: #f1f5f9;
             --dark: #1e293b;
             --success: #22c55e;
@@ -129,17 +130,17 @@
         }
         
         .responsavel {
-            background-color: rgba(34, 197, 94, 0.2);
+            background-color: rgba(27, 94, 32, 0.2);
             font-weight: 600;
         }
         
         .corresponsavel {
-            background-color: rgba(59, 130, 246, 0.2);
+            background-color: rgba(38, 166, 154, 0.2);
             font-weight: 600;
         }
         
         .consultado {
-            background-color: rgba(245, 158, 11, 0.2);
+            background-color: rgba(0, 188, 212, 0.2);
         }
         
         .informado {
@@ -193,19 +194,20 @@
             <button class="filter-button" data-category="inovacao">Inovação</button>
             <button class="filter-button" data-category="crises">Gestão de Crises</button>
             <button class="filter-button" data-category="conformidade">Conformidade</button>
+            <button class="filter-button" data-category="resultados">Gestão de Resultados</button>
         </div>
         
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background-color: rgba(34, 197, 94, 0.2);"></div>
+                <div class="legend-color" style="background-color: rgba(27, 94, 32, 0.2);"></div>
                 <span>R - Responsável</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: rgba(59, 130, 246, 0.2);"></div>
+                <div class="legend-color" style="background-color: rgba(38, 166, 154, 0.2);"></div>
                 <span>C - Corresponsável</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: rgba(245, 158, 11, 0.2);"></div>
+                <div class="legend-color" style="background-color: rgba(0, 188, 212, 0.2);"></div>
                 <span>C - Consultado</span>
             </div>
             <div class="legend-item">
@@ -592,60 +594,107 @@
                         <td class="corresponsavel">Corresponsável</td>
                         <td class="responsavel">Responsável</td>
                     </tr>
+                    
+                    <!-- Gestão de Resultados -->
+                    <tr class="category-header" data-category="resultados">
+                        <td colspan="3">Gestão de Resultados</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Definição de OKRs (Objectives and Key Results) da equipe</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Estabelecimento de KPIs operacionais (SLA, tempo resposta, etc.)</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Definição de KPIs técnicos (qualidade, reincidência, etc.)</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Acompanhamento e monitoramento de indicadores</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="informado">Informado</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Análise de variações nos indicadores</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Criação de dashboards e relatórios gerenciais</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="apoia">Apoia</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Definição de metas de produtividade da equipe</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="consultado">Consultado</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Estabelecimento de metas de qualidade técnica</td>
+                        <td class="consultado">Consultado</td>
+                        <td class="responsavel">Responsável</td>
+                    </tr>
+                    <tr data-category="resultados">
+                        <td>Avaliação de performance individual da equipe</td>
+                        <td class="responsavel">Responsável</td>
+                        <td class="corresponsavel">Corresponsável</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-    </div>
-    
-    <footer>
-        <div class="container">
+        
+        <footer>
             <p>© 2025 Matriz RACI - Gestão de Assistência Técnica</p>
-        </div>
-    </footer>
-    
+        </footer>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Referências aos elementos
             const filterButtons = document.querySelectorAll('.filter-button');
             const tableRows = document.querySelectorAll('#raciTable tbody tr');
             
-            // Variável de estado
-            let currentCategory = 'all';
-            
-            // Função para atualizar a visualização da tabela
-            function updateTableView() {
-                // Primeiro, oculta todas as linhas
-                tableRows.forEach(row => {
-                    row.style.display = 'none';
-                });
-                
-                // Exibe as linhas que correspondem à categoria atual
-                tableRows.forEach(row => {
-                    const rowCategory = row.getAttribute('data-category');
-                    
-                    if (currentCategory === 'all' || rowCategory === currentCategory) {
-                        row.style.display = '';
-                    }
-                });
-            }
-            
-            // Event listener para botões de filtro
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // Atualiza a categoria selecionada
-                    currentCategory = this.getAttribute('data-category');
-                    
-                    // Atualiza classes dos botões
+                    // Remove a classe 'active' de todos os botões
                     filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Adiciona a classe 'active' apenas ao botão clicado
                     this.classList.add('active');
                     
-                    // Atualiza a visualização
-                    updateTableView();
+                    const category = this.getAttribute('data-category');
+                    
+                    tableRows.forEach(row => {
+                        if (row.classList.contains('category-header')) {
+                            // Mostra cabeçalhos apenas se houver linhas da categoria abaixo
+                            let showHeader = false;
+                            if (category === 'all') {
+                                showHeader = true;
+                            } else {
+                                const nextRows = [];
+                                let next = row.nextElementSibling;
+                                while (next && !next.classList.contains('category-header')) {
+                                    nextRows.push(next);
+                                    next = next.nextElementSibling;
+                                }
+                                
+                                showHeader = nextRows.some(r => r.getAttribute('data-category') === category);
+                            }
+                            
+                            row.style.display = showHeader ? '' : 'none';
+                        } else {
+                            if (category === 'all' || row.getAttribute('data-category') === category) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
                 });
             });
-            
-            // Inicializa a visualização
-            updateTableView();
         });
     </script>
 </body>
